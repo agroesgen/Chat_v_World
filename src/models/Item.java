@@ -1,17 +1,22 @@
 package models;
 
-public abstract class Item {
-    protected String name;
+public class Item {
+    protected String name, effect;
     protected int cost, capacity, movementModifier;
 
-    public Item(String name, int cost, int capacity) {
+    public Item(String name, int cost, int capacity, String effect) {
         this.name = name;
         this.cost = cost;
         this.capacity = capacity;
+        this.effect = effect;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getEffect() {
+    	return effect;
     }
 
     public int getCost() {

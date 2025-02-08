@@ -3,8 +3,8 @@ package models;
 public class Armor extends Item {
     private int leadership, saveBonus, toughnessBonus, movementModifier, woundsBonus;
 
-    public Armor(String name, int movementModifier, int cost, int capacity, int saveBonus, int toughnessBonus, int woundsBonus) {
-        super(name, cost, capacity);
+    public Armor(String name, int movementModifier, int cost, int capacity, int saveBonus, int toughnessBonus, int woundsBonus, String effect) {
+        super(name, cost, capacity, effect);
         this.saveBonus = saveBonus;
         this.toughnessBonus = toughnessBonus;
         this.movementModifier = movementModifier;
@@ -28,6 +28,9 @@ public class Armor extends Item {
     @Override
     public int getMovementModifier() {
         return movementModifier;
+    }
+    public String getEffect() {
+    	return effect;
     }
 
     @Override

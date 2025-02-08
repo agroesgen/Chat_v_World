@@ -29,3 +29,5 @@ public class Main {
     }
 }
 
+// Nächste Updates sind limitierte Anzahl von Gegenständen, Einheiten speichern und laden
+// Cheatsheet export?

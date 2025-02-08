@@ -125,6 +125,7 @@ public class Unit {
                     weapon.getTwoHanded(),
                     weapon.getAttacks(),
                     weapon.getEffectiveStrength(this), // Stärke hängt von der Einheit ab
+                    weapon.getIndieStrength(),
                     weapon.getDamage(),
                     weapon.getAP(),
                     weapon.getRange(),

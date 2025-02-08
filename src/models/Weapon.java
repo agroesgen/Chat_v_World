@@ -1,12 +1,12 @@
 package models;
 
 public class Weapon extends Item {
-    private int attacks, strength, damage, ap, leadership;
-    private String range, effect;
-    private boolean twoHanded;
+    private int attacks, strength, ap, leadership;
+    private String range, effect, damage;
+    private boolean twoHanded, indieStrength;
 
-    public Weapon(String name, int cost, int capacity, boolean twoHanded, int attacks, int strength, int damage, int ap, String range, String effect) {
-        super(name, cost, capacity);
+    public Weapon(String name, int cost, int capacity, boolean twoHanded, int attacks, int strength, boolean indieStrength, String damage, int ap, String range, String effect) {
+        super(name, cost, capacity, effect);
         this.twoHanded = twoHanded;
         this.attacks = attacks;
         this.strength = strength;
@@ -14,6 +14,7 @@ public class Weapon extends Item {
         this.ap = ap;
         this.range = range;
         this.effect = effect;
+        this.indieStrength = indieStrength;
     }
 
     @Override
@@ -27,6 +28,10 @@ public class Weapon extends Item {
     }
     
     public int getEffectiveStrength(Unit unit) {
+    	if (getIndieStrength()) {
+    		return strength;
+    	}
+    	else
     	return strength + unit.getStrength(); // Stärke basiert auf Toughness der Einheit
     }
     
@@ -37,6 +42,10 @@ public class Weapon extends Item {
     
     public boolean getTwoHanded() {
     	return twoHanded;
+    }
+
+    public boolean getIndieStrength() {
+    	return indieStrength;
     }
     
     public void setEffectiveStrength(int strength) {
@@ -51,7 +60,7 @@ public class Weapon extends Item {
         return ap;
     }
 
-    public int getDamage() {
+    public String getDamage() {
         return damage;
     }
     
