@@ -1,5 +1,7 @@
 package models;
 
+import game.GameSetup;
+
 public class Armor extends Item {
     private int leadership, saveBonus, toughnessBonus, movementModifier, woundsBonus;
 
@@ -35,6 +37,6 @@ public class Armor extends Item {
 
     @Override
     public String toString() {
-        return name + " (+" + saveBonus + " Save, +" + toughnessBonus + " Toughness " + ", Capacity: " + super.capacity +")";
+        return "(" + GameSetup.getItemLimitManager().getRemaining(name) + ") " + name + " (+" + saveBonus + " Save, +" + toughnessBonus + " Toughness " + ", Capacity: " + super.capacity +")";
     }
 }

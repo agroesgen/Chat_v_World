@@ -1,5 +1,7 @@
 package models;
 
+import game.GameSetup;
+
 public class Weapon extends Item {
     private int attacks, strength, ap, leadership;
     private String range, effect, damage;
@@ -24,7 +26,7 @@ public class Weapon extends Item {
 
     @Override
     public String toString() {
-        return name + " (+" + strength + " Stärke, " + attacks + " Attacken, " + (twoHanded ? "2H" : "1H") + ", AP: " + ap + ", Damage: " + damage + ", Capacity: " + super.capacity + ")";
+        return "(" + GameSetup.getItemLimitManager().getRemaining(name) + ") " + name + " (+" + strength + " Stärke, " + attacks + " Attacken, " + (twoHanded ? "2H" : "1H") + ", AP: " + ap + ", Damage: " + damage + ", Capacity: " + super.capacity + ")";
     }
     
     public int getEffectiveStrength(Unit unit) {

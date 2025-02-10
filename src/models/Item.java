@@ -1,5 +1,7 @@
 package models;
 
+import game.GameSetup;
+
 public class Item {
     protected String name, effect;
     protected int cost, capacity, movementModifier;
@@ -45,7 +47,7 @@ public class Item {
 
     @Override
     public String toString() {
-        return name + " (Kapazität: " + capacity + ")";
+        return "(" + GameSetup.getItemLimitManager().getRemaining(name) + ") " + name + " (Kapazität: " + capacity + ")";
     }
     
     public int getMovementModifier() {

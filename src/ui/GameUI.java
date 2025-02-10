@@ -11,7 +11,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameUI extends Application {
     private List<Unit> units = GameSetup.createUnits();
@@ -22,6 +24,7 @@ public class GameUI extends Application {
     private ListView<Item> itemListView;
     private ListView<Item> equippedItemsView;
     private ListView<Weapon> weaponsView;
+    private VBox itemsBox;
 
     @Override
     public void start(Stage primaryStage) {
@@ -65,10 +68,15 @@ public class GameUI extends Application {
                     equippedItemsView.getItems().setAll(selectedUnit.getEquipment());
                     weaponsView.getItems().setAll(selectedUnit.getWeapons());
                 } else {
-                    showAlert("Kapazitätsgrenze erreicht!", "Diese Einheit kann keinen weiteren Gegenstand tragen.");
+                    showAlert("Kapazitätsgrenze oder Gegenstandslimit erreicht!", "Diese Einheit kann keinen weiteren Gegenstand tragen.");
                 }
             }
+            updateItemListView();
         });
+        
+     // Button: Item-Limit anpassen
+        Button editLimitsButton = new Button("Item-Limits ändern");
+        editLimitsButton.setOnAction(e -> openItemLimitEditor());
         
      // Button: Gegenstand entfernen
         Button removeButton = new Button("Entfernen");
@@ -85,11 +93,12 @@ public class GameUI extends Application {
 
         // Layouts
         VBox unitBox = new VBox(new Label("Einheit wählen:"), unitComboBox, unitStatsLabel);
-        VBox itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
+        itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
         VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, usedCapacityLabel);
         VBox weaponsBox = new VBox(new Label("Waffen der Einheit:"), weaponsView);
+        VBox controlsBox = new VBox(editLimitsButton);
 
-        HBox root = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox);
+        HBox root = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox);
         root.setPadding(new javafx.geometry.Insets(15));
 
         primaryStage.setScene(new Scene(root, 1000, 600));
@@ -120,6 +129,70 @@ public class GameUI extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    private void openItemLimitEditor() {
+        Stage limitStage = new Stage();
+        limitStage.setTitle("Item-Limits bearbeiten");
+
+        VBox layout = new VBox(10);
+        layout.getChildren().add(new Label("Item Limits bearbeiten:"));
+        layout.setPadding(new javafx.geometry.Insets(15));
+        
+        List<TextField> textFields = new ArrayList<>();
+        
+        //Label itemLabel = new Label("");
+        //TextField limitField = new TextField("");
+        
+        for (Item item : items) {
+            HBox row = new HBox(10);
+            Label itemNameLabel = new Label(item.getName());
+            
+            TextField limitField = new TextField();
+            limitField.setText(String.valueOf(GameSetup.getItemLimitManager().getMaxLimits().get(item.getName()))); // Aktuelles Limit setzen
+            textFields.add(limitField); // Textfeld zur Liste hinzufügen
+            
+            row.getChildren().addAll(itemNameLabel, limitField);
+            layout.getChildren().add(row);
+        }
+
+        Button saveButton = new Button("Speichern");
+        layout.getChildren().add(saveButton);
+        
+        saveButton.setOnAction(e -> {
+            for (int i = 0; i < items.size(); i++) {
+                String itemName = items.get(i).getName();
+                try {
+                    int newLimit = Integer.parseInt(textFields.get(i).getText());
+                    GameSetup.getItemLimitManager().setMaxLimit(itemName, newLimit);
+                } catch (NumberFormatException ex) {
+                    showAlert("Fehler", "Ungültige Eingabe für " + itemName);
+                }
+            }           
+         // Neues Label erstellen
+            updateItemListView();
+
+            
+            showAlert("Erfolg", "Alle Limits wurden gespeichert!");
+        });
+
+        Scene scene = new Scene(layout, 400, 800);
+        limitStage.setScene(scene);
+        limitStage.show();
+    }
+    
+    private void updateItemListView() {
+        itemListView.getItems().clear();
+        itemListView.getItems().addAll(items);
+    	
+    	ListView<Item> neueItemListView = new ListView<>();
+    
+	    neueItemListView = itemListView;
+	    // Altes Element ersetzen
+	    int index = itemsBox.getChildren().indexOf(itemListView);
+	    if (index != -1) {
+	        itemsBox.getChildren().set(index, neueItemListView);
+	    }
     }
 
     public static void main(String[] args) {

@@ -1,9 +1,9 @@
 package game;
 
-	import models.Unit;
-	import models.Item;
-	import ui.GameUI;
 	import java.util.List;
+	import models.Item;
+	import models.Unit;
+	import ui.GameUI;
 
 public class Main {
 	
@@ -29,5 +29,5 @@ public class Main {
     }
 }
 
-// Nächste Updates sind limitierte Anzahl von Gegenständen, Einheiten speichern und laden
+// Einheiten speichern und laden
 // Cheatsheet export?

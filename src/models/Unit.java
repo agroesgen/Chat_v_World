@@ -2,6 +2,8 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import game.GameSetup;
+import game.ItemLimitManager;
 
 public class Unit {
     private String name;
@@ -27,17 +29,23 @@ public class Unit {
     }
 
     public boolean addItem(Item item) {
-        int usedCapacity = equipment.stream().mapToInt(Item::getCapacity).sum();
-        if (usedCapacity + item.getCapacity() <= this.capacity) {
+    	ItemLimitManager limitManager = GameSetup.getItemLimitManager();
+    	
+    	int usedCapacity = equipment.stream().mapToInt(Item::getCapacity).sum();
+        if (usedCapacity + item.getCapacity() <= this.capacity && limitManager.equipItem(item.getName())) {
             equipment.add(item);
             return true;
         }
-        return false; // Zu viel Gewicht
+        else {
+            System.out.println("Limit für " + item.getName() + " erreicht!");
+            return false;
+        }// Zu viel Gewicht
     }
     
     public void removeItem(Item item) {
         if (equipment.contains(item)) {
             equipment.remove(item);
+        	GameSetup.getItemLimitManager().unequipItem(item.getName());
             System.out.println(item.getName() + " wurde entfernt.");
         } else {
             System.out.println("Das Item ist nicht in der Ausrüstungsliste.");

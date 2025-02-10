@@ -2,12 +2,18 @@ package game;
 
 import models.Unit;
 import models.Item;
+import game.ItemLimitManager;
 import models.Weapon;
 import models.Armor;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class GameSetup {
+	
+	private static final ItemLimitManager itemLimitManager = new ItemLimitManager();
+
     public static List<Unit> createUnits() {
         List<Unit> units = new ArrayList<>();
         units.add(new Unit("Viewer", 30, 6, 6, 2, 2, 1, 1, 9, 6, 5, "-"));
@@ -19,7 +25,7 @@ public class GameSetup {
     }
 
     public static List<Item> createItems() {
-        List<Item> items = new ArrayList<>();
+    	List<Item> items = new ArrayList<>();
         // Itemeigenschaften (name, cost, capacity, effect)
         // Waffeneigenschaften (name, cost, capacity, twoHanded, attacks, strength, damage, ap, range, effect)
         // Armor Eigenschaften (name, movementModifier, cost, capacity, saveBonus, toughnessBonus, woundsBonus)
@@ -37,7 +43,21 @@ public class GameSetup {
         items.add(new Item("Heiltrank",2500,2,"Heilt 1 Wunde"));
         items.add(new Item("Pferd",10000, -2,"Movement 60m, Charge 3d6, Gegen Fußsoldaten: S+2 & T+1 "));
         
+        // Setzt für alle Items in der Liste ein Standardlimit von z. B. 5
+        
+        for (Item item : items) {
+            itemLimitManager.setMaxLimit(item.getName(), 5);
+        }
         return items;
     }
+    
+    public static ItemLimitManager getItemLimitManager() {
+        return itemLimitManager;
+    }
+    
+
+
+    // Hier können auch Methoden für das Erstellen von Einheiten und Items stehen
+
 }
 
