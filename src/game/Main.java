@@ -6,9 +6,6 @@ package game;
 	import ui.GameUI;
 
 public class Main {
-	
-
-	
     public static void main(String[] args) {
         List<Unit> units = GameSetup.createUnits();
         List<Item> items = GameSetup.createItems();

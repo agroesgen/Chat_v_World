@@ -4,6 +4,7 @@ import game.GameSetup;
 import models.Item;
 import models.Unit;
 import models.Weapon;
+import storage.UnitStorage;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -18,13 +19,15 @@ import java.util.Map;
 public class GameUI extends Application {
     private List<Unit> units = GameSetup.createUnits();
     private List<Item> items = GameSetup.createItems();
-    private Unit selectedUnit;
+    private static Unit selectedUnit;
     private Label unitStatsLabel;
     private Label usedCapacityLabel;
     private ListView<Item> itemListView;
     private ListView<Item> equippedItemsView;
     private ListView<Weapon> weaponsView;
+    private ListView<Unit> savedUnitsView;
     private VBox itemsBox;
+    private UnitStorage unitStorage = new UnitStorage();
 
     @Override
     public void start(Stage primaryStage) {
@@ -55,6 +58,65 @@ public class GameUI extends Application {
 
         // Liste der Waffen der Einheit
         weaponsView = new ListView<>();
+        
+        // Button: Einheit speichern
+        Button saveUnitButton = new Button("Einheit speichern");
+        saveUnitButton.setOnAction(e -> {
+            if (selectedUnit != null) {
+                // Einheit speichern
+            	
+            	TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Einheit speichern");
+                dialog.setHeaderText("Einheitenname eingeben:");
+                dialog.setContentText("Name:");
+
+                dialog.showAndWait().ifPresent(name -> {
+                    if (!name.trim().isEmpty()) {
+                    	unitStorage.setCurrentUnit(selectedUnit);
+                    	unitStorage.saveCurrentUnit(name);
+
+	                // Liste der gespeicherten Einheiten aktualisieren
+	                savedUnitsView.getItems().setAll(unitStorage.getSavedUnits());
+	
+	                // Einheit zurücksetzen
+	                equippedItemsView.getItems().clear();
+	                updateUnitStats();
+                    }	else {
+                    		showAlert("Fehler", "Bitte einen gültigen Namen eingeben.");
+                    	}
+                });
+            }
+        });
+
+        // Button: Gespeicherte Einheit laden
+        Button loadUnitButton = new Button("Einheit laden");
+        loadUnitButton.setOnAction(e -> {
+            Unit selectedSavedUnit = savedUnitsView.getSelectionModel().getSelectedItem();
+            if (selectedSavedUnit != null) {
+            	System.out.println("" + selectedSavedUnit.getName());
+            	selectedUnit = selectedSavedUnit;
+            	
+                System.out.println("" + selectedSavedUnit.getEquipment());
+                updateUnitStats();
+                updateUsedCapacity();
+                equippedItemsView.getItems().setAll(selectedSavedUnit.getEquipment());
+                //unitComboBox.setValue(selectedUnit);
+            }
+        });
+        
+     // Button: Einheit zurücksetzen
+        Button clearUnitButton = new Button("Einheit zurücksetzen");
+        clearUnitButton.setOnAction(e -> {
+            if (selectedUnit != null) {
+                selectedUnit.clearEquipment();
+                equippedItemsView.getItems().clear();
+                updateUnitStats();
+                updateUsedCapacity();
+            }
+        });
+        
+     // Liste der gespeicherten Einheiten
+        savedUnitsView = new ListView<>();
 
         // Button: Gegenstand ausrüsten
         Button equipButton = new Button("Ausrüsten");
@@ -92,13 +154,15 @@ public class GameUI extends Application {
         });
 
         // Layouts
-        VBox unitBox = new VBox(new Label("Einheit wählen:"), unitComboBox, unitStatsLabel);
+        VBox unitBox = new VBox(new Label("Einheit wählen:"), unitComboBox, unitStatsLabel, clearUnitButton);
         itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
-        VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, usedCapacityLabel);
+        VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, saveUnitButton, usedCapacityLabel);
         VBox weaponsBox = new VBox(new Label("Waffen der Einheit:"), weaponsView);
         VBox controlsBox = new VBox(editLimitsButton);
+        
+        VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
 
-        HBox root = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox);
+        HBox root = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
         root.setPadding(new javafx.geometry.Insets(15));
 
         primaryStage.setScene(new Scene(root, 1000, 600));
@@ -193,6 +257,10 @@ public class GameUI extends Application {
 	    if (index != -1) {
 	        itemsBox.getChildren().set(index, neueItemListView);
 	    }
+    }
+    
+    public static Unit getSelectedUnit() {
+    	return selectedUnit;
     }
 
     public static void main(String[] args) {

@@ -1,12 +1,11 @@
 package game;
 
-import models.Unit;
-import models.Item;
-import game.ItemLimitManager;
-import models.Weapon;
-import models.Armor;
 import java.util.ArrayList;
 import java.util.List;
+import models.Armor;
+import models.Item;
+import models.Unit;
+import models.Weapon;
 
 
 
@@ -16,11 +15,11 @@ public class GameSetup {
 
     public static List<Unit> createUnits() {
         List<Unit> units = new ArrayList<>();
-        units.add(new Unit("Viewer", 30, 6, 6, 2, 2, 1, 1, 9, 6, 5, "-"));
-        units.add(new Unit("Follower", 30, 5, 5, 2, 3, 1, 1, 8, 6, 7, "-"));
-        units.add(new Unit("T1 Sub", 30, 4, 4, 3, 3, 2, 1, 7, 5, 9, "Leader"));
-        units.add(new Unit("T2 Sub", 30, 3, 3, 4, 3, 3, 2, 6, 5, 10, "Leader"));
-        units.add(new Unit("T3 Sub", 30, 3, 3, 5, 3, 4, 3, 5, 5, 12, "Leader"));
+        units.add(new Unit("Viewer", 30, 6, 6, 2, 2, 1, 1, 9, 6, 5, "-", new ArrayList<>()));
+        units.add(new Unit("Follower", 30, 5, 5, 2, 3, 1, 1, 8, 6, 7, "-", new ArrayList<>()));
+        units.add(new Unit("T1 Sub", 30, 4, 4, 3, 3, 2, 1, 7, 5, 9, "Leader", new ArrayList<>()));
+        units.add(new Unit("T2 Sub", 30, 3, 3, 4, 3, 3, 2, 6, 5, 10, "Leader", new ArrayList<>()));
+        units.add(new Unit("T3 Sub", 30, 3, 3, 5, 3, 4, 3, 5, 5, 12, "Leader", new ArrayList<>()));
         return units;
     }
 

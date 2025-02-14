@@ -5,14 +5,14 @@ import java.util.List;
 import game.GameSetup;
 import game.ItemLimitManager;
 
-public class Unit {
+public class Unit implements Cloneable{
     private String name;
     private int movement, ws, bs, strength, baseToughness, baseWounds, attacks, baseLeadership, baseSave, capacity;
     private String special;
     private List<Item> equipment;
 
     public Unit(String name, int movement, int ws, int bs, int strength, int toughness, int wounds,
-                int attacks, int leadership, int save, int capacity, String special) {
+                int attacks, int leadership, int save, int capacity, String special, ArrayList<Item> equipment) {
         this.name = name;
         this.movement = movement;
         this.ws = ws;
@@ -25,8 +25,15 @@ public class Unit {
         this.baseSave = save;
         this.capacity = capacity;
         this.special = special;
-        this.equipment = new ArrayList<>();
+        this.equipment = equipment;
     }
+    
+    /*    // Overriding the clone() method
+    @Override
+    public Unit clone() throws CloneNotSupportedException {
+        // Returning a clone of the current object
+        return (Unit) super.clone(); 
+    }*/
 
     public boolean addItem(Item item) {
     	ItemLimitManager limitManager = GameSetup.getItemLimitManager();
@@ -52,17 +59,126 @@ public class Unit {
         }
     }
     
-    public int getUsedCapacity() {
-    	int usedCapacity = equipment.stream().mapToInt(Item::getCapacity).sum();
-    	return usedCapacity;
+ // Getter and Setter methods
+    public String getName() {
+        return name;
     }
-    
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getMovement() {
+        return movement;
+    }
+
+    public void setMovement(int movement) {
+        this.movement = movement;
+    }
+
+    public int getWs() {
+        return ws;
+    }
+
+    public void setWs(int ws) {
+        this.ws = ws;
+    }
+
+    public int getBs() {
+        return bs;
+    }
+
+    public void setBs(int bs) {
+        this.bs = bs;
+    }
+
     public int getStrength() {
         return strength;
     }
-    
+
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
+
+    public int getBaseToughness() {
+        return baseToughness;
+    }
+
+    public void setBaseToughness(int baseToughness) {
+        this.baseToughness = baseToughness;
+    }
+
+    public int getBaseWounds() {
+        return baseWounds;
+    }
+
+    public void setBaseWounds(int baseWounds) {
+        this.baseWounds = baseWounds;
+    }
+
+    public int getAttacks() {
+        return attacks;
+    }
+
+    public void setAttacks(int attacks) {
+        this.attacks = attacks;
+    }
+
+    public int getBaseLeadership() {
+        return baseLeadership;
+    }
+
+    public void setBaseLeadership(int baseLeadership) {
+        this.baseLeadership = baseLeadership;
+    }
+
+    public int getBaseSave() {
+        return baseSave;
+    }
+
+    public void setBaseSave(int baseSave) {
+        this.baseSave = baseSave;
+    }
+
     public int getCapacity() {
         return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getSpecial() {
+        return special;
+    }
+
+    public void setSpecial(String special) {
+        this.special = special;
+    }
+
+    public List<Item> getEquipment() {
+        return new ArrayList<>(equipment);
+    }
+
+    public void setEquipment(List<Item> equipment) {
+        this.equipment = new ArrayList<>(equipment);
+    }
+
+    // Clone method
+    @Override
+    public Unit clone() {
+        try {
+            Unit cloned = (Unit) super.clone();
+            cloned.equipment = new ArrayList<>(this.equipment); // Deep copy of equipment list
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Should never happen
+        }
+    }
+   
+    public int getUsedCapacity() {
+    	int usedCapacity = equipment.stream().mapToInt(Item::getCapacity).sum();
+    	return usedCapacity;
     }
     
     public int getEffectiveMovement() {
@@ -115,9 +231,9 @@ public class Unit {
         }
         return modifiedLeadership;
     }
-
-    public List<Item> getEquipment() {
-        return equipment;
+    
+    public void clearEquipment() {
+    	this.equipment.clear();
     }
     
     public List<Weapon> getWeapons() {
@@ -143,10 +259,6 @@ public class Unit {
             }
         }
         return weapons;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override
