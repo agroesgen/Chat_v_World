@@ -32,6 +32,8 @@ public class GameSetup {
         items.add(new Weapon("Dolch", 2000, 1, false, 1, 0, false, "1", 1, "Nah", "Keine"));
         items.add(new Weapon("Hellebarde", 4500, 3, true, 1, 2, false, "d3", 1, "Nah", "Keine"));
         items.add(new Weapon("Bogen", 2000, 2, true, 1, 0, false, "1", 0, "100m", "BS+1 bei >60m"));
+        items.add(new Weapon("Bolzenwerfer", 5000, 3, true, 1, 1, false, "1", 0, "100m", "Rapidfire 1"));
+        items.add(new Weapon("Langbogen", 5000, 3, true, 1, 1, false, "1", 0, "180m", "Heavy, Indirect Fire"));
         items.add(new Weapon("Bombe", 3500, 3, false, 1, 4, true, "1", 0, "30m", "BLAST, 1x pro Einheit"));
         
         items.add(new Armor("Schild", 0, 2500, 2, 1, 0, 0,""));

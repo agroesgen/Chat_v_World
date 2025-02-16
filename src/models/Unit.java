@@ -93,8 +93,14 @@ public class Unit implements Cloneable{
     }
 
     public int getStrength() {
-        return strength;
-    }
+        int modifiedStrength = strength;
+     	for (Item item : equipment) {
+         	if (item.getName()=="Pferd") {
+             modifiedStrength = strength+1;
+         	}
+         }
+     	return modifiedStrength;
+     }
 
     public void setStrength(int strength) {
         this.strength = strength;
@@ -184,9 +190,13 @@ public class Unit implements Cloneable{
     public int getEffectiveMovement() {
         int modifiedMovement = movement;
         for (Item item : equipment) {
+            if (item.getName()=="Pferd") {
+                modifiedMovement += 30;
+            }
             if (item instanceof Armor) {
                 modifiedMovement += ((Armor) item).getMovementModifier();
             }
+
         }
         return modifiedMovement;
     }
@@ -195,7 +205,10 @@ public class Unit implements Cloneable{
     public int getEffectiveToughness() {
         int modifiedToughness = baseToughness;
         for (Item item : equipment) {
-            if (item instanceof Armor) {
+            if (item.getName()=="Pferd") {
+                modifiedToughness += 1;
+            }
+        	if (item instanceof Armor) {
                 modifiedToughness += ((Armor) item).getToughnessBonus();
             }
         }
