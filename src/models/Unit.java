@@ -163,7 +163,7 @@ public class Unit implements Cloneable{
     }
 
     public List<Item> getEquipment() {
-        return new ArrayList<>(equipment);
+        return equipment;
     }
 
     public void setEquipment(List<Item> equipment) {

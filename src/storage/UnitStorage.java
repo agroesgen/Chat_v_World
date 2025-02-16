@@ -17,12 +17,8 @@ public class UnitStorage {
         if (currentUnit != null) {
             // Kopiere die aktuelle Einheit und speichere sie
             Unit clonedUnit = currentUnit.clone();   //!!!! Die gleiche Instanz wird überspielt und keine neue/eigenständige Abgespeichert
-            System.out.println(""+ clonedUnit.getEquipment());
             clonedUnit.setName(name);
-            System.out.println(""+ GameUI.getSelectedUnit().getName());
             savedUnits.add(clonedUnit);
-            System.out.println("Einheit gespeichert: " + name);
-            System.out.println("" + savedUnits.getFirst().getEquipment());
         } else {
             System.out.println("Keine Einheit ausgewählt!");
         }

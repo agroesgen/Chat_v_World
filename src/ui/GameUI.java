@@ -21,6 +21,7 @@ public class GameUI extends Application {
     private List<Item> items = GameSetup.createItems();
     private static Unit selectedUnit;
     private Label unitStatsLabel;
+    private Label [] savedUnitStatsLabel = new Label [5];
     private Label usedCapacityLabel;
     private ListView<Item> itemListView;
     private ListView<Item> equippedItemsView;
@@ -51,6 +52,14 @@ public class GameUI extends Application {
             equippedItemsView.getItems().setAll(selectedUnit.getEquipment());
             weaponsView.getItems().setAll(selectedUnit.getWeapons());
         });
+        
+        savedUnitStatsLabel[0]= new Label("Hier soll die savedUnitStats stehen.");
+        
+        // Dropdown Auswahl der gespeicherten Einheiten
+    	saveSlotComboBox1.setOnAction(e -> {
+    		savedUnitStatsLabel[0].setText(unitStats(saveSlotComboBox1.getValue()).getText());
+    		System.out.println(savedUnitStatsLabel[0].getText());
+    	});
 
         // Label zur Anzeige der aktuellen Einheit-Attribute
         unitStatsLabel = new Label("Wähle eine Einheit aus");
@@ -87,9 +96,13 @@ public class GameUI extends Application {
 	                savedUnitsView.getItems().setAll(unitStorage.getSavedUnits());
 	
 	                // Einheit zurücksetzen
-	                equippedItemsView.getItems().clear();
+	                selectedUnit.getEquipment().clear();
+	                selectedUnit = unitComboBox.getValue();
 	                updateUnitStats();
 	                updateSafeSlotComboBoxes();
+	                weaponsView.getItems().setAll(selectedUnit.getWeapons());
+	                equippedItemsView.getItems().setAll(selectedUnit.getEquipment());
+	                
                     }	else {
                     		showAlert("Fehler", "Bitte einen gültigen Namen eingeben.");
                     	}
@@ -102,13 +115,12 @@ public class GameUI extends Application {
         loadUnitButton.setOnAction(e -> {
             Unit selectedSavedUnit = savedUnitsView.getSelectionModel().getSelectedItem();
             if (selectedSavedUnit != null) {
-            	System.out.println("" + selectedSavedUnit.getName());
             	selectedUnit = selectedSavedUnit;
             	
-                System.out.println("" + selectedSavedUnit.getEquipment());
                 updateUnitStats();
                 updateUsedCapacity();
                 equippedItemsView.getItems().setAll(selectedSavedUnit.getEquipment());
+                weaponsView.getItems().setAll(selectedUnit.getWeapons());
                 //unitComboBox.setValue(selectedUnit);
             }
         });
@@ -166,16 +178,16 @@ public class GameUI extends Application {
         
         VBox unitBox = new VBox(new Label("Einheit wählen:"), unitComboBox, unitStatsLabel, clearUnitButton);
         itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
-        VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, usedCapacityLabel);
+        VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, saveUnitButton, usedCapacityLabel);
         VBox weaponsBox = new VBox(new Label("Waffen der Einheit:"), weaponsView);
         VBox controlsBox = new VBox(editLimitsButton);        
         VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
 
-        VBox saveSlot1 = new VBox(saveSlotComboBox1);
-        VBox saveSlot2 = new VBox(saveSlotComboBox2);
-        VBox saveSlot3 = new VBox(new Label("saveSlot3"));
-        VBox saveSlot4 = new VBox(new Label("saveSlot4"));
-        VBox saveSlot5 = new VBox(new Label("saveSlot5"));
+        VBox saveSlot1 = new VBox(new Label("SaveSlot 1"), saveSlotComboBox1, savedUnitStatsLabel[0]);
+        VBox saveSlot2 = new VBox(new Label("SaveSlot 2"), saveSlotComboBox2);
+        VBox saveSlot3 = new VBox(new Label("SaveSlot 3"), saveSlotComboBox3);
+        VBox saveSlot4 = new VBox(new Label("SaveSlot 4"), saveSlotComboBox4);
+        VBox saveSlot5 = new VBox(new Label("SaveSlot 5"), saveSlotComboBox5);
         
         HBox controlsLayout = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
         controlsLayout.setPadding(new javafx.geometry.Insets(15));
@@ -190,14 +202,25 @@ public class GameUI extends Application {
 
     private void updateUnitStats() {
         if (selectedUnit != null) {
-            unitStatsLabel.setText("Name: " + selectedUnit.getName() +
-                    "\nMovement: " + selectedUnit.getEffectiveMovement() +
-                    "\nStrength: " + selectedUnit.getStrength()+
-                    "\nToughness: " + selectedUnit.getEffectiveToughness() +
-                    "\nWounds: " + selectedUnit.getEffectiveWounds() +
-                    "\nSave: " + selectedUnit.getEffectiveSave() +
-                    "\nLeadership: " + selectedUnit.getEffectiveLeadership());
+            unitStatsLabel.setText(unitStats(selectedUnit).getText());
         }
+    }
+    
+    private Label unitStats(Unit unit) {
+    	Label unitStats = new Label("");
+    	
+    	if (unit != null) {
+    		unitStats.setText("Name: " + unit.getName() + 
+    				"\nMovement: " + unit.getEffectiveMovement() +
+                    "\nWS: " + unit.getWs() +
+                    "\nBS: " + unit.getBs() +
+                    "\nStrength: " + unit.getStrength()+
+                    "\nToughness: " + unit.getEffectiveToughness() +
+                    "\nWounds: " + unit.getEffectiveWounds() +
+                    "\nSave: " + unit.getEffectiveSave() +
+                    "\nLeadership: " + unit.getEffectiveLeadership());
+    	}     
+    	return unitStats;
     }
     
     private void updateSafeSlotComboBoxes() {
