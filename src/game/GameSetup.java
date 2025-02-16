@@ -15,6 +15,7 @@ public class GameSetup {
 
     public static List<Unit> createUnits() {
         List<Unit> units = new ArrayList<>();
+        // Uniteigenschaften (name, movement, ws, bs, strength, toughness, wounds, attacks, ls, save, cap, special, equipment
         units.add(new Unit("Viewer", 30, 6, 6, 2, 2, 1, 1, 9, 6, 5, "-", new ArrayList<>()));
         units.add(new Unit("Follower", 30, 5, 5, 2, 3, 1, 1, 8, 6, 7, "-", new ArrayList<>()));
         units.add(new Unit("T1 Sub", 30, 4, 4, 3, 3, 2, 1, 7, 5, 9, "Leader", new ArrayList<>()));
@@ -33,6 +34,8 @@ public class GameSetup {
         items.add(new Weapon("Hellebarde", 4500, 3, true, 1, 2, false, "d3", 1, "Nah", "Keine"));
         items.add(new Weapon("Bogen", 2000, 2, true, 1, 0, false, "1", 0, "100m", "BS+1 bei >60m"));
         items.add(new Weapon("Bombe", 3500, 3, false, 1, 4, true, "1", 0, "30m", "BLAST, 1x pro Einheit"));
+        items.add(new Weapon("Bolzenwerfer", 5000, 3, true, 1, 1, false, "1", 0, "100m", "Rapidfire 1"));
+        items.add(new Weapon("Langbogen", 5000, 3, true, 1, 1, false, "1", 0, "180m", "Heavy, Indirect Fire"));
         
         items.add(new Armor("Schild", 0, 2500, 2, 1, 0, 0,""));
         items.add(new Armor("Lederrüstung", 0, 2500, 1, 0, 1, 0, ""));

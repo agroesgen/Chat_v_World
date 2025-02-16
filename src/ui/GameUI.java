@@ -21,6 +21,7 @@ public class GameUI extends Application {
     private List<Item> items = GameSetup.createItems();
     private static Unit selectedUnit;
     private Label unitStatsLabel;
+    private Label savedUnitStatsLabel;
     private Label usedCapacityLabel;
     private ListView<Item> itemListView;
     private ListView<Item> equippedItemsView;
@@ -28,7 +29,13 @@ public class GameUI extends Application {
     private ListView<Unit> savedUnitsView;
     private VBox itemsBox;
     private UnitStorage unitStorage = new UnitStorage();
-
+    
+    private ComboBox<Unit> saveSlotComboBox1= new ComboBox<>();
+    private ComboBox<Unit> saveSlotComboBox2= new ComboBox<>();
+    private ComboBox<Unit> saveSlotComboBox3= new ComboBox<>();
+    private ComboBox<Unit> saveSlotComboBox4= new ComboBox<>();
+    private ComboBox<Unit> saveSlotComboBox5= new ComboBox<>();
+    
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Einheiten-Ausrüstung");
@@ -81,6 +88,7 @@ public class GameUI extends Application {
 	                // Einheit zurücksetzen
 	                equippedItemsView.getItems().clear();
 	                updateUnitStats();
+	                updateSaveSlotComboBoxes();
                     }	else {
                     		showAlert("Fehler", "Bitte einen gültigen Namen eingeben.");
                     	}
@@ -154,25 +162,45 @@ public class GameUI extends Application {
         });
 
         // Layouts
+         
         VBox unitBox = new VBox(new Label("Einheit wählen:"), unitComboBox, unitStatsLabel, clearUnitButton);
         itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
         VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, saveUnitButton, usedCapacityLabel);
         VBox weaponsBox = new VBox(new Label("Waffen der Einheit:"), weaponsView);
-        VBox controlsBox = new VBox(editLimitsButton);
-        
+        VBox controlsBox = new VBox(editLimitsButton);        
         VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
 
-        HBox root = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
-        root.setPadding(new javafx.geometry.Insets(15));
+        VBox saveSlot1 = new VBox(saveSlotComboBox1);
+        VBox saveSlot2 = new VBox(saveSlotComboBox2);
+        VBox saveSlot3 = new VBox(new Label("saveSlot3"));
+        VBox saveSlot4 = new VBox(new Label("saveSlot4"));
+        VBox saveSlot5 = new VBox(new Label("saveSlot5"));
+        
+        HBox controlsLayout = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
+        controlsLayout.setPadding(new javafx.geometry.Insets(15));
+        HBox overview = new HBox (20, saveSlot1, saveSlot2, saveSlot3, saveSlot4, saveSlot5);
+        overview.setPadding(new javafx.geometry.Insets(15));
+        
+        VBox root = new VBox (20, controlsLayout, overview);
 
         primaryStage.setScene(new Scene(root, 1000, 600));
         primaryStage.show();
+    }
+    
+    private void updateSaveSlotComboBoxes() {
+    	saveSlotComboBox1.getItems().addAll(unitStorage.getSavedUnits());
+    	saveSlotComboBox2.getItems().addAll(unitStorage.getSavedUnits());
+    	saveSlotComboBox3.getItems().addAll(unitStorage.getSavedUnits());
+    	saveSlotComboBox4.getItems().addAll(unitStorage.getSavedUnits());
+    	saveSlotComboBox5.getItems().addAll(unitStorage.getSavedUnits());
     }
 
     private void updateUnitStats() {
         if (selectedUnit != null) {
             unitStatsLabel.setText("Name: " + selectedUnit.getName() +
                     "\nMovement: " + selectedUnit.getEffectiveMovement() +
+                    "\nWS: " + selectedUnit.getWS() +
+                    "\nBS: " + selectedUnit.getBS() +
                     "\nStrength: " + selectedUnit.getStrength()+
                     "\nToughness: " + selectedUnit.getEffectiveToughness() +
                     "\nWounds: " + selectedUnit.getEffectiveWounds() +
