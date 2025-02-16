@@ -7,6 +7,7 @@ import models.Weapon;
 import storage.UnitStorage;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -17,11 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 public class GameUI extends Application {
+    private static final int UNIT_AMOUNT = 5;
+    
+    private Label unitStatsLabel;
+    private Label[] savedUnitStatsLabel = new Label[UNIT_AMOUNT];
+    private ComboBox<Unit>[] saveSlotComboBoxes = new ComboBox[UNIT_AMOUNT];
+        
     private List<Unit> units = GameSetup.createUnits();
     private List<Item> items = GameSetup.createItems();
     private static Unit selectedUnit;
-    private Label unitStatsLabel;
-    private Label [] savedUnitStatsLabel = new Label [5];
     private Label usedCapacityLabel;
     private ListView<Item> itemListView;
     private ListView<Item> equippedItemsView;
@@ -29,14 +34,6 @@ public class GameUI extends Application {
     private ListView<Unit> savedUnitsView;
     private VBox itemsBox;
     private UnitStorage unitStorage = new UnitStorage();
-    
-   // private ComboBox<Unit> [] saveSlotComboBoxes = new ComboBox<>()[5];
-        
-    private ComboBox<Unit> saveSlotComboBox1= new ComboBox<>();
-    private ComboBox<Unit> saveSlotComboBox2= new ComboBox<>();
-    private ComboBox<Unit> saveSlotComboBox3= new ComboBox<>();
-    private ComboBox<Unit> saveSlotComboBox4= new ComboBox<>();
-    private ComboBox<Unit> saveSlotComboBox5= new ComboBox<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -53,35 +50,16 @@ public class GameUI extends Application {
             weaponsView.getItems().setAll(selectedUnit.getWeapons());
         });
         
-        for (int i=0; i<5; i++){
-        	savedUnitStatsLabel[i] = new Label("");
+        // Initialisiere ComboBoxen und Labels in einer Schleife
+        for (int i = 0; i < UNIT_AMOUNT; i++) {
+            saveSlotComboBoxes[i] = new ComboBox<>();
+            savedUnitStatsLabel[i] = new Label("");
+
+            int index = i; // Notwendig für Lambda-Ausdruck (final oder effectively final)
+            saveSlotComboBoxes[i].setOnAction(e -> {
+                savedUnitStatsLabel[index].setText(unitStats(saveSlotComboBoxes[index].getValue()).getText());
+            });
         }
-        
-		// Dropdown Auswahl der gespeicherten Einheiten
-    	saveSlotComboBox1.setOnAction(e -> {
-    		savedUnitStatsLabel[0].setText(unitStats(saveSlotComboBox1.getValue()).getText());
-    		System.out.println(savedUnitStatsLabel[0].getText());
-    	});
-    	
-    	saveSlotComboBox2.setOnAction(e -> {
-    		savedUnitStatsLabel[1].setText(unitStats(saveSlotComboBox2.getValue()).getText());
-    		System.out.println(savedUnitStatsLabel[0].getText());
-    	});
-    	
-    	saveSlotComboBox3.setOnAction(e -> {
-    		savedUnitStatsLabel[2].setText(unitStats(saveSlotComboBox3.getValue()).getText());
-    		System.out.println(savedUnitStatsLabel[0].getText());
-    	});
-    	
-    	saveSlotComboBox4.setOnAction(e -> {
-    		savedUnitStatsLabel[3].setText(unitStats(saveSlotComboBox4.getValue()).getText());
-    		System.out.println(savedUnitStatsLabel[0].getText());
-    	});
-    	
-    	saveSlotComboBox5.setOnAction(e -> {
-    		savedUnitStatsLabel[4].setText(unitStats(saveSlotComboBox5.getValue()).getText());
-    		System.out.println(savedUnitStatsLabel[0].getText());
-    	});
 
         // Label zur Anzeige der aktuellen Einheit-Attribute
         unitStatsLabel = new Label("Wähle eine Einheit aus");
@@ -137,8 +115,7 @@ public class GameUI extends Application {
         loadUnitButton.setOnAction(e -> {
             Unit selectedSavedUnit = savedUnitsView.getSelectionModel().getSelectedItem();
             if (selectedSavedUnit != null) {
-            	selectedUnit = selectedSavedUnit;
-            	
+            	selectedUnit = selectedSavedUnit;            	
                 updateUnitStats();
                 updateUsedCapacity();
                 equippedItemsView.getItems().setAll(selectedSavedUnit.getEquipment());
@@ -205,16 +182,17 @@ public class GameUI extends Application {
         VBox controlsBox = new VBox(editLimitsButton);        
         VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
 
-        VBox saveSlot1 = new VBox(new Label("SaveSlot 1"), saveSlotComboBox1, savedUnitStatsLabel[0]);
-        VBox saveSlot2 = new VBox(new Label("SaveSlot 2"), saveSlotComboBox2, savedUnitStatsLabel[1]);
-        VBox saveSlot3 = new VBox(new Label("SaveSlot 3"), saveSlotComboBox3, savedUnitStatsLabel[2]);
-        VBox saveSlot4 = new VBox(new Label("SaveSlot 4"), saveSlotComboBox4, savedUnitStatsLabel[3]);
-        VBox saveSlot5 = new VBox(new Label("SaveSlot 5"), saveSlotComboBox5, savedUnitStatsLabel[4]);
-        
         HBox controlsLayout = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
         controlsLayout.setPadding(new javafx.geometry.Insets(15));
-        HBox overview = new HBox (20, saveSlot1, saveSlot2, saveSlot3, saveSlot4, saveSlot5);
-        overview.setPadding(new javafx.geometry.Insets(15));
+        
+        // Layouts für Save Slots dynamisch generieren
+        HBox overview = new HBox(20);
+        overview.setPadding(new Insets(15));
+
+        for (int i = 0; i < UNIT_AMOUNT; i++) {
+            VBox saveSlotBox = new VBox(new Label("SaveSlot " + (i + 1)), saveSlotComboBoxes[i], savedUnitStatsLabel[i]);
+            overview.getChildren().add(saveSlotBox);
+        }
         
         VBox root = new VBox (20, controlsLayout, overview);
 
@@ -246,13 +224,10 @@ public class GameUI extends Application {
     }
     
     private void updateSafeSlotComboBoxes() {
-    	
-    	saveSlotComboBox1.getItems().setAll(unitStorage.getSavedUnits());    
-    	saveSlotComboBox2.getItems().setAll(unitStorage.getSavedUnits());    
-    	saveSlotComboBox3.getItems().setAll(unitStorage.getSavedUnits());    
-    	saveSlotComboBox4.getItems().setAll(unitStorage.getSavedUnits());    
-    	saveSlotComboBox5.getItems().setAll(unitStorage.getSavedUnits());    
-    	
+        List<Unit> savedUnits = unitStorage.getSavedUnits();
+        for (ComboBox<Unit> comboBox : saveSlotComboBoxes) {
+            comboBox.getItems().setAll(savedUnits);
+        }
     }
     
     private void updateUsedCapacity() {

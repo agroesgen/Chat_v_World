@@ -26,9 +26,6 @@ public class Main {
     }
 }
 
-// Einheiten speichern und laden
 // Cheatsheet export?
-
 // Entfernen Button soll ohne Auswahl einfach den letzten Eintrag entfernen
 // Geladene Einheiten unter gleichem Namen speicher => überschreiben
-// 

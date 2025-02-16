@@ -106,6 +106,16 @@ public class Unit implements Cloneable{
         this.strength = strength;
     }
 
+    public List<Item> getInventory() {
+    	List<Item> inventory = new ArrayList<>();
+    	for (Item item : equipment) {
+    		if (!(item instanceof Armor)) {
+    			inventory.add(item);
+    		}
+    	}
+    	return inventory;
+    }
+    
     public int getBaseToughness() {
         return baseToughness;
     }
