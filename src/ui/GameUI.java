@@ -31,7 +31,7 @@ public class GameUI extends Application {
     private UnitStorage unitStorage = new UnitStorage();
     
    // private ComboBox<Unit> [] saveSlotComboBoxes = new ComboBox<>()[5];
-    
+        
     private ComboBox<Unit> saveSlotComboBox1= new ComboBox<>();
     private ComboBox<Unit> saveSlotComboBox2= new ComboBox<>();
     private ComboBox<Unit> saveSlotComboBox3= new ComboBox<>();
@@ -53,11 +53,33 @@ public class GameUI extends Application {
             weaponsView.getItems().setAll(selectedUnit.getWeapons());
         });
         
-        savedUnitStatsLabel[0]= new Label("Hier soll die savedUnitStats stehen.");
+        for (int i=0; i<5; i++){
+        	savedUnitStatsLabel[i] = new Label("");
+        }
         
-        // Dropdown Auswahl der gespeicherten Einheiten
+		// Dropdown Auswahl der gespeicherten Einheiten
     	saveSlotComboBox1.setOnAction(e -> {
     		savedUnitStatsLabel[0].setText(unitStats(saveSlotComboBox1.getValue()).getText());
+    		System.out.println(savedUnitStatsLabel[0].getText());
+    	});
+    	
+    	saveSlotComboBox2.setOnAction(e -> {
+    		savedUnitStatsLabel[1].setText(unitStats(saveSlotComboBox2.getValue()).getText());
+    		System.out.println(savedUnitStatsLabel[0].getText());
+    	});
+    	
+    	saveSlotComboBox3.setOnAction(e -> {
+    		savedUnitStatsLabel[2].setText(unitStats(saveSlotComboBox3.getValue()).getText());
+    		System.out.println(savedUnitStatsLabel[0].getText());
+    	});
+    	
+    	saveSlotComboBox4.setOnAction(e -> {
+    		savedUnitStatsLabel[3].setText(unitStats(saveSlotComboBox4.getValue()).getText());
+    		System.out.println(savedUnitStatsLabel[0].getText());
+    	});
+    	
+    	saveSlotComboBox5.setOnAction(e -> {
+    		savedUnitStatsLabel[4].setText(unitStats(saveSlotComboBox5.getValue()).getText());
     		System.out.println(savedUnitStatsLabel[0].getText());
     	});
 
@@ -184,10 +206,10 @@ public class GameUI extends Application {
         VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
 
         VBox saveSlot1 = new VBox(new Label("SaveSlot 1"), saveSlotComboBox1, savedUnitStatsLabel[0]);
-        VBox saveSlot2 = new VBox(new Label("SaveSlot 2"), saveSlotComboBox2);
-        VBox saveSlot3 = new VBox(new Label("SaveSlot 3"), saveSlotComboBox3);
-        VBox saveSlot4 = new VBox(new Label("SaveSlot 4"), saveSlotComboBox4);
-        VBox saveSlot5 = new VBox(new Label("SaveSlot 5"), saveSlotComboBox5);
+        VBox saveSlot2 = new VBox(new Label("SaveSlot 2"), saveSlotComboBox2, savedUnitStatsLabel[1]);
+        VBox saveSlot3 = new VBox(new Label("SaveSlot 3"), saveSlotComboBox3, savedUnitStatsLabel[2]);
+        VBox saveSlot4 = new VBox(new Label("SaveSlot 4"), saveSlotComboBox4, savedUnitStatsLabel[3]);
+        VBox saveSlot5 = new VBox(new Label("SaveSlot 5"), saveSlotComboBox5, savedUnitStatsLabel[4]);
         
         HBox controlsLayout = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
         controlsLayout.setPadding(new javafx.geometry.Insets(15));
@@ -196,7 +218,7 @@ public class GameUI extends Application {
         
         VBox root = new VBox (20, controlsLayout, overview);
 
-        primaryStage.setScene(new Scene(root, 1000, 600));
+        primaryStage.setScene(new Scene(root, 1000, 800));
         primaryStage.show();
     }
 
