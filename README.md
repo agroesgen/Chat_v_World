@@ -1,0 +1,1 @@
+Run programm with command: mvn clean javafx:run in the root directory of the project.

@@ -28,4 +28,5 @@ public class Main {
 
 // Cheatsheet export?
 // Entfernen Button soll ohne Auswahl einfach den letzten Eintrag entfernen
+// Entfernen der gespeicherten Einheit macht die Items wieder verfügbar
 // Geladene Einheiten unter gleichem Namen speicher => überschreiben

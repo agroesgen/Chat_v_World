@@ -31,6 +31,8 @@ public class Armor extends Item {
     public int getMovementModifier() {
         return movementModifier;
     }
+
+    @Override
     public String getEffect() {
     	return effect;
     }

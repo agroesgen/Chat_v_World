@@ -1,9 +1,8 @@
 package storage;
 
-import models.Unit;
 import java.util.ArrayList;
 import java.util.List;
-import ui.GameUI;
+import models.Unit;
 
 public class UnitStorage {
     private final List<Unit> savedUnits = new ArrayList<>();

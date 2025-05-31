@@ -168,6 +168,7 @@ public class GameUI extends Application {
                 selectedUnit.removeItem(selectedItem);
                 updateUnitStats();
                 updateUsedCapacity();
+                updateItemListView();
                 equippedItemsView.getItems().setAll(selectedUnit.getEquipment());
                 weaponsView.getItems().setAll(selectedUnit.getWeapons());
             }
