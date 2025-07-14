@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GameUI extends Application {
-    private static final int UNIT_AMOUNT = 5;
+    private static final int UNIT_AMOUNT = 10;
     
     private Label unitStatsLabel;
     private Label[] savedUnitStatsLabel = new Label[UNIT_AMOUNT];
@@ -191,11 +191,50 @@ public class GameUI extends Application {
         overview.setPadding(new Insets(15));
 
         for (int i = 0; i < UNIT_AMOUNT; i++) {
-            VBox saveSlotBox = new VBox(new Label("SaveSlot " + (i + 1)), saveSlotComboBoxes[i], savedUnitStatsLabel[i]);
+            int index = i;
+            Label weaponInfoLabel = new Label("Waffen: ");
+
+            saveSlotComboBoxes[i].setOnAction(e -> {
+                Unit selected = saveSlotComboBoxes[index].getValue();
+                if (selected != null) {
+                    savedUnitStatsLabel[index].setText(unitStats(selected).getText());
+
+                    // Waffeninformationen aufbauen
+                    StringBuilder weaponText = new StringBuilder("Waffen:\n");
+                    for (Weapon weapon : selected.getWeapons()) {
+                        weaponText.append("- ")
+                                  .append(weapon.getName())
+                                  .append(" (S: ").append(weapon.getEffectiveStrength(saveSlotComboBoxes[index].getValue()))
+                                  .append(", AP: ").append(weapon.getAP())
+                                  .append(", D: ").append(weapon.getDamage())
+                                  .append(", Effects: ").append(weapon.getEffect())
+                                  .append(")\n");
+                    }
+                    weaponInfoLabel.setText(weaponText.toString());
+                }
+            });
+        	
+            //Zeigt die gespeicherte Einheit und ihre Waffen an           
+            VBox saveSlotBox = new VBox(
+                new Label("SaveSlot " + (i + 1)),
+                saveSlotComboBoxes[i],
+                savedUnitStatsLabel[i],
+                weaponInfoLabel
+            );
+            saveSlotBox.setSpacing(5);
             overview.getChildren().add(saveSlotBox);
+            
         }
         
-        VBox root = new VBox (20, controlsLayout, overview);
+     // ScrollPane erstellen
+        ScrollPane scrollPane = new ScrollPane(overview);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setFitToWidth(false); // horizontales Scrollen erlauben
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        // Root-Layout
+        VBox root = new VBox(20, controlsLayout, scrollPane);
 
         primaryStage.setScene(new Scene(root, 1000, 800));
         primaryStage.show();

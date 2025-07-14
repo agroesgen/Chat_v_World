@@ -50,9 +50,9 @@ public class Weapon extends Item {
     	return indieStrength;
     }
     
-    public void setEffectiveStrength(int strength) {
+    /*public void setEffectiveStrength(int strength) {
         this.strength = strength;
-    }
+    }*/
     
     public int getAttacks() {
         return attacks;

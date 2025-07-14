@@ -271,7 +271,7 @@ public class Unit implements Cloneable{
                     weapon.getCapacity(),
                     weapon.getTwoHanded(),
                     weapon.getAttacks(),
-                    weapon.getEffectiveStrength(this), // Stärke hängt von der Einheit ab
+                    weapon.getStrengthBonus(),
                     weapon.getIndieStrength(),
                     weapon.getDamage(),
                     weapon.getAP(),
