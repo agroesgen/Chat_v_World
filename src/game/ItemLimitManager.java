@@ -1,6 +1,8 @@
 package game;
 import java.util.HashMap;
 import java.util.Map;
+import models.Item;
+import models.Unit;
 
 public class ItemLimitManager {
     private final Map<String, Integer> maxLimits;  // Speichert das maximale Limit pro Item-Typ
@@ -21,6 +23,16 @@ public class ItemLimitManager {
         return maxLimits;
     }
 
+    public boolean addUnitPossible(Unit unit) {
+        for (Item item : unit.getEquipment()) {
+            String itemName = item.getName();
+            if (!canEquip(itemName)) {
+                return false; // Wenn ein Item nicht ausgerüstet werden kann, ist die Einheit nicht möglich
+            }
+        }
+        return true; // Alle Items können ausgerüstet werden
+    }
+
     // Prüft, ob das Item ausgerüstet werden darf
     public boolean canEquip(String itemName) {
         int currentCount = equippedCounts.getOrDefault(itemName, 0);
@@ -30,12 +42,8 @@ public class ItemLimitManager {
     }
 
     // Fügt ein Item hinzu, falls es erlaubt ist
-    public boolean equipItem(String itemName) {
-        if (canEquip(itemName)) {
-            equippedCounts.put(itemName, equippedCounts.getOrDefault(itemName, 0) + 1);
-            return true;
-        }
-        return false; // Limit erreicht
+    public void equipItem(String itemName) {
+        equippedCounts.put(itemName, equippedCounts.getOrDefault(itemName, 0) + 1);
     }
 
     // Entfernt ein Item aus der Zählung

@@ -1,10 +1,12 @@
 package ui;
 
 import game.GameSetup;
+import game.ItemLimitManager;
 import models.Item;
 import models.Unit;
 import models.Weapon;
 import storage.UnitStorage;
+import storage.PdfExporter;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -19,11 +21,14 @@ import java.util.Map;
 
 public class GameUI extends Application {
     private static final int UNIT_AMOUNT = 10;
+
+    ItemLimitManager limitManager = GameSetup.getItemLimitManager();
     
     private Label unitStatsLabel;
-    private Label[] savedUnitStatsLabel = new Label[UNIT_AMOUNT];
+    private TextArea[] savedUnitStatsTextArea = new TextArea[UNIT_AMOUNT];
     private ComboBox<Unit>[] saveSlotComboBoxes = new ComboBox[UNIT_AMOUNT];
-        
+    private Spinner<Integer>[] quantitySpinner = new Spinner[UNIT_AMOUNT];
+
     private List<Unit> units = GameSetup.createUnits();
     private List<Item> items = GameSetup.createItems();
     private static Unit selectedUnit;
@@ -49,15 +54,16 @@ public class GameUI extends Application {
             equippedItemsView.getItems().setAll(selectedUnit.getEquipment());
             weaponsView.getItems().setAll(selectedUnit.getWeapons());
         });
-        
+
+
         // Initialisiere ComboBoxen und Labels in einer Schleife
         for (int i = 0; i < UNIT_AMOUNT; i++) {
             saveSlotComboBoxes[i] = new ComboBox<>();
-            savedUnitStatsLabel[i] = new Label("");
-
+            savedUnitStatsTextArea[i] = new TextArea("");
+            
             int index = i; // Notwendig für Lambda-Ausdruck (final oder effectively final)
             saveSlotComboBoxes[i].setOnAction(e -> {
-                savedUnitStatsLabel[index].setText(unitStats(saveSlotComboBoxes[index].getValue()).getText());
+                savedUnitStatsTextArea[index].setText(unitStats(saveSlotComboBoxes[index].getValue()).getText() + "\nItems: " + saveSlotComboBoxes[index].getValue().getItems() + "\nArmor: " + saveSlotComboBoxes[index].getValue().getArmors());
             });
         }
 
@@ -173,6 +179,11 @@ public class GameUI extends Application {
                 weaponsView.getItems().setAll(selectedUnit.getWeapons());
             }
         });
+        
+     // Button: Item-Limit anpassen
+        Button exportButton = new Button("PDF Exportieren");
+        PdfExporter exporter = new PdfExporter();
+        exportButton.setOnAction(e -> exporter.exportUnitWithEquipment(selectedUnit, selectedUnit.getWeapons(),selectedUnit.getInventory(),selectedUnit.getName()+".pdf"));
 
      // Layouts
         
@@ -180,7 +191,7 @@ public class GameUI extends Application {
         itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
         VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, saveUnitButton, usedCapacityLabel);
         VBox weaponsBox = new VBox(new Label("Waffen der Einheit:"), weaponsView);
-        VBox controlsBox = new VBox(editLimitsButton);        
+        VBox controlsBox = new VBox(editLimitsButton, exportButton);        
         VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
 
         HBox controlsLayout = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
@@ -192,12 +203,52 @@ public class GameUI extends Application {
 
         for (int i = 0; i < UNIT_AMOUNT; i++) {
             int index = i;
-            Label weaponInfoLabel = new Label("Waffen: ");
+            TextArea weaponInfoTextArea = new TextArea("Waffen: ");
+            weaponInfoTextArea.setWrapText(true);
+            weaponInfoTextArea.setMaxWidth(250); // Max. Breite!
+            weaponInfoTextArea.setPrefWidth(250);
+            VBox.setVgrow(weaponInfoTextArea, Priority.NEVER);
+            
+            savedUnitStatsTextArea[i].setWrapText(true);
+            savedUnitStatsTextArea[i].setMaxWidth(250);
+            savedUnitStatsTextArea[i].setPrefWidth(250);
+            VBox.setVgrow(savedUnitStatsTextArea[i], Priority.NEVER);
+            
+            quantitySpinner[i] = new Spinner<>();
+            quantitySpinner[i].setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1));
 
             saveSlotComboBoxes[i].setOnAction(e -> {
                 Unit selected = saveSlotComboBoxes[index].getValue();
                 if (selected != null) {
-                    savedUnitStatsLabel[index].setText(unitStats(selected).getText());
+                    savedUnitStatsTextArea[index].setText(unitStats(selected).getText() + "\nItems: " + selected.getItems() + "\nArmor: " + selected.getArmors());
+                }
+
+                quantitySpinner[index].valueProperty().addListener((obs, oldVal, newVal) -> {
+                    if (limitManager.addUnitPossible(selected)) {
+                        if (selected != null && newVal > oldVal) {
+                            for (Item item : selected.getEquipment()) {
+                                for (int j = oldVal; j < newVal; j++) {
+                                    if (limitManager.canEquip(item.getName())) {
+                                        limitManager.equipItem(item.getName());
+                                    // Item erfolgreich ausgerüstet
+                                    } else {
+                                        break; // Abbruch, wenn Limit erreicht
+                                        }
+                                }
+                            } 
+                        } else if (selected != null && newVal < oldVal) {
+                            for (Item item : selected.getEquipment()) {
+                                for (int j = newVal; j < oldVal; j++) {
+                                    limitManager.unequipItem(item.getName());
+                                }
+                            }
+                        }
+                    updateItemListView();
+                    }
+                    else {
+                        quantitySpinner[index].getValueFactory().setValue(oldVal); // Setzt den alten Wert zurück
+                    }
+                });
 
                     // Waffeninformationen aufbauen
                     StringBuilder weaponText = new StringBuilder("Waffen:\n");
@@ -210,18 +261,19 @@ public class GameUI extends Application {
                                   .append(", Effects: ").append(weapon.getEffect())
                                   .append(")\n");
                     }
-                    weaponInfoLabel.setText(weaponText.toString());
-                }
+                    weaponInfoTextArea.setText(weaponText.toString());
+	                    
             });
         	
             //Zeigt die gespeicherte Einheit und ihre Waffen an           
             VBox saveSlotBox = new VBox(
-                new Label("SaveSlot " + (i + 1)),
+                new Label("SaveSlot " + (i + 1)), new Label("Anzahl:"), quantitySpinner[i],
                 saveSlotComboBoxes[i],
-                savedUnitStatsLabel[i],
-                weaponInfoLabel
+                savedUnitStatsTextArea[i],
+                weaponInfoTextArea
             );
             saveSlotBox.setSpacing(5);
+            saveSlotBox.setMaxWidth(270); // Optional: begrenzt komplette VBox
             overview.getChildren().add(saveSlotBox);
             
         }
@@ -259,7 +311,7 @@ public class GameUI extends Application {
                     "\nWounds: " + unit.getEffectiveWounds() +
                     "\nSave: " + unit.getEffectiveSave() +
                     "\nLeadership: " + unit.getEffectiveLeadership());
-    	}     
+    	}
     	return unitStats;
     }
     

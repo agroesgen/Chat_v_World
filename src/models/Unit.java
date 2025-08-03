@@ -39,8 +39,9 @@ public class Unit implements Cloneable{
     	ItemLimitManager limitManager = GameSetup.getItemLimitManager();
     	
     	int usedCapacity = equipment.stream().mapToInt(Item::getCapacity).sum();
-        if (usedCapacity + item.getCapacity() <= this.capacity && limitManager.equipItem(item.getName())) {
+        if (usedCapacity + item.getCapacity() <= this.capacity && limitManager.canEquip(item.getName())) {
             equipment.add(item);
+            limitManager.equipItem(item.getName());
             return true;
         }
         else {
@@ -282,6 +283,38 @@ public class Unit implements Cloneable{
             }
         }
         return weapons;
+    }
+
+    public List<Armor> getArmors() {
+        List<Armor> armors = new ArrayList<>();
+        for (Item item : equipment) {
+            if (item instanceof Armor) {
+                Armor armor = (Armor) item;
+                // Erstelle eine neue Armor mit berechneten Werten
+                Armor modifiedArmor = new Armor(
+                    armor.getName(),
+                    armor.getMovementModifier(),
+                    armor.getCost(),
+                    armor.getCapacity(),
+                    armor.getSaveBonus(),
+                    armor.getToughnessBonus(),
+                    armor.getWoundsBonus(),
+                    armor.getEffect()
+                );
+                armors.add(modifiedArmor);
+            }
+        }
+        return armors;
+    }
+
+    public List<Item> getItems() {
+        List<Item> items = new ArrayList<>();
+        for (Item item : equipment) {
+            if (!(item instanceof Weapon) && !(item instanceof Armor)) {
+                items.add(item);
+            }
+        }
+        return items;
     }
 
     @Override

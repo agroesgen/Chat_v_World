@@ -1,9 +1,10 @@
 package game;
+import java.util.List;
 
-	import java.util.List;
-	import models.Item;
-	import models.Unit;
-	import ui.GameUI;
+import game.GameSetup;
+import models.Item;
+import models.Unit;
+import ui.GameUI;
 
 public class Main {
     public static void main(String[] args) {
