@@ -27,13 +27,6 @@ public class Unit implements Cloneable{
         this.special = special;
         this.equipment = equipment;
     }
-    
-    /*    // Overriding the clone() method
-    @Override
-    public Unit clone() throws CloneNotSupportedException {
-        // Returning a clone of the current object
-        return (Unit) super.clone(); 
-    }*/
 
     public boolean addItem(Item item) {
     	ItemLimitManager limitManager = GameSetup.getItemLimitManager();
@@ -59,8 +52,20 @@ public class Unit implements Cloneable{
             System.out.println("Das Item ist nicht in der Ausrüstungsliste.");
         }
     }
-    
- // Getter and Setter methods
+
+    // Clone method
+    @Override
+    public Unit clone() {
+        try {
+            Unit cloned = (Unit) super.clone();
+            cloned.equipment = new ArrayList<>(this.equipment); // Deep copy of equipment list
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Should never happen
+        }
+    }
+
+    // Getter and Setter methods
     public String getName() {
         return name;
     }
@@ -180,18 +185,6 @@ public class Unit implements Cloneable{
     public void setEquipment(List<Item> equipment) {
         this.equipment = new ArrayList<>(equipment);
     }
-
-    // Clone method
-    @Override
-    public Unit clone() {
-        try {
-            Unit cloned = (Unit) super.clone();
-            cloned.equipment = new ArrayList<>(this.equipment); // Deep copy of equipment list
-            return cloned;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError(); // Should never happen
-        }
-    }
    
     public int getUsedCapacity() {
     	int usedCapacity = equipment.stream().mapToInt(Item::getCapacity).sum();
@@ -211,7 +204,6 @@ public class Unit implements Cloneable{
         }
         return modifiedMovement;
     }
-
 
     public int getEffectiveToughness() {
         int modifiedToughness = baseToughness;

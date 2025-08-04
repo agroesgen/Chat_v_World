@@ -9,6 +9,7 @@ import storage.UnitStorage;
 import storage.PdfExporter;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -39,6 +40,8 @@ public class GameUI extends Application {
     private ListView<Unit> savedUnitsView;
     private VBox itemsBox;
     private UnitStorage unitStorage = new UnitStorage();
+
+    boolean isUpdatingSpinner = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -200,7 +203,8 @@ public class GameUI extends Application {
         // Layouts für Save Slots dynamisch generieren
         HBox overview = new HBox(20);
         overview.setPadding(new Insets(15));
-
+        
+        // Savelot-Inhalt (Unitstats und Waffen) initialisieren und hinzufügen
         for (int i = 0; i < UNIT_AMOUNT; i++) {
             int index = i;
             TextArea weaponInfoTextArea = new TextArea("Waffen: ");
@@ -223,9 +227,11 @@ public class GameUI extends Application {
                     savedUnitStatsTextArea[index].setText(unitStats(selected).getText() + "\nItems: " + selected.getItems() + "\nArmor: " + selected.getArmors());
                 }
 
+                
                 quantitySpinner[index].valueProperty().addListener((obs, oldVal, newVal) -> {
-                    if (limitManager.addUnitPossible(selected)) {
-                        if (selected != null && newVal > oldVal) {
+                    if (isUpdatingSpinner) return; // Verhindert rekursive Aufrufe
+                    if (selected != null && newVal > oldVal) {
+                        if (limitManager.addUnitPossible(selected)) {
                             for (Item item : selected.getEquipment()) {
                                 for (int j = oldVal; j < newVal; j++) {
                                     if (limitManager.canEquip(item.getName())) {
@@ -235,19 +241,22 @@ public class GameUI extends Application {
                                         break; // Abbruch, wenn Limit erreicht
                                         }
                                 }
-                            } 
-                        } else if (selected != null && newVal < oldVal) {
+                            }
+                        } else {
+                            isUpdatingSpinner = true; // Verhindert rekursive Aufrufe
+                            quantitySpinner[index].getValueFactory().setValue(oldVal); // Setzt den alten Wert zurück
+                            isUpdatingSpinner = false; // Rekursive Aufrufe wieder zulassen
+                            return; // Abbruch, wenn Limit erreicht
+                        }
+                    } else if (selected != null && newVal < oldVal) {
                             for (Item item : selected.getEquipment()) {
                                 for (int j = newVal; j < oldVal; j++) {
                                     limitManager.unequipItem(item.getName());
                                 }
                             }
-                        }
+                        
+                    }
                     updateItemListView();
-                    }
-                    else {
-                        quantitySpinner[index].getValueFactory().setValue(oldVal); // Setzt den alten Wert zurück
-                    }
                 });
 
                     // Waffeninformationen aufbauen
@@ -327,14 +336,6 @@ public class GameUI extends Application {
             usedCapacityLabel.setText("Used Capacity: " + selectedUnit.getUsedCapacity() + " / " + + selectedUnit.getCapacity());
         }
     }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
     
     private void openItemLimitEditor() {
         Stage limitStage = new Stage();
@@ -404,6 +405,13 @@ public class GameUI extends Application {
     	return selectedUnit;
     }
 
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
     public static void main(String[] args) {
         launch(args);
     }
