@@ -23,15 +23,35 @@ public class ItemLimitManager {
         return maxLimits;
     }
 
-    public boolean addUnitPossible(Unit unit) {
-        for (Item item : unit.getEquipment()) {
-            String itemName = item.getName();
-            if (!canEquip(itemName)) {
-                return false; // Wenn ein Item nicht ausgerüstet werden kann, ist die Einheit nicht möglich
-            }
-        }
-        return true; // Alle Items können ausgerüstet werden
+public boolean addUnitPossible(Unit unit) {
+    // Zähle, wie oft jedes Item im Unit-Equipment vorkommt
+    Map<String, Integer> tempCounts = new HashMap<>();
+    for (Item item : unit.getEquipment()) {
+        String itemName = item.getName();
+        tempCounts.put(itemName, tempCounts.getOrDefault(itemName, 0) + 1);
     }
+
+    // Prüfe für jedes Item, ob das Limit überschritten würde
+    for (Map.Entry<String, Integer> entry : tempCounts.entrySet()) {
+        String itemName = entry.getKey();
+        int toEquip = entry.getValue();
+        int currentCount = equippedCounts.getOrDefault(itemName, 0);
+        int maxLimit = maxLimits.getOrDefault(itemName, Integer.MAX_VALUE);
+
+        if (currentCount + toEquip > maxLimit) {
+            return false; // Limit würde überschritten
+        }
+    }
+
+    // Wenn alles passt, rüste die Items tatsächlich aus
+    for (Map.Entry<String, Integer> entry : tempCounts.entrySet()) {
+        String itemName = entry.getKey();
+        int toEquip = entry.getValue();
+        equippedCounts.put(itemName, equippedCounts.getOrDefault(itemName, 0) + toEquip);
+    }
+
+    return true;
+}
 
     // Prüft, ob das Item ausgerüstet werden darf
     public boolean canEquip(String itemName) {

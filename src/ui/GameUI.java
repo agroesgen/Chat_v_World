@@ -188,15 +188,21 @@ public class GameUI extends Application {
         PdfExporter exporter = new PdfExporter();
         exportButton.setOnAction(e -> exporter.exportUnitWithEquipment(selectedUnit, selectedUnit.getWeapons(),selectedUnit.getInventory(),selectedUnit.getName()+".pdf"));
 
-     // Layouts
+        Button removeSavedUnitButton = new Button("Einheit entfernen");
+        removeSavedUnitButton.setOnAction(e -> {
+            Unit selectedSavedUnit = savedUnitsView.getSelectionModel().getSelectedItem();
+            if (selectedSavedUnit != null) {
+                removeSavedUnitAndReleaseItems(selectedSavedUnit);
+            }
+        });
         
+        // Layouts
         VBox unitBox = new VBox(new Label("Einheit wählen:"), unitComboBox, unitStatsLabel, clearUnitButton);
         itemsBox = new VBox(new Label("Verfügbare Items:"), itemListView, equipButton);
         VBox equippedBox = new VBox(new Label("Ausgerüstete Items:"), equippedItemsView, removeButton, saveUnitButton, usedCapacityLabel);
         VBox weaponsBox = new VBox(new Label("Waffen der Einheit:"), weaponsView);
         VBox controlsBox = new VBox(editLimitsButton, exportButton);        
-        VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton);
-
+        VBox savedUnitsBox = new VBox(new Label("Gespeicherte Einheiten:"), savedUnitsView, loadUnitButton, removeSavedUnitButton);
         HBox controlsLayout = new HBox(20, unitBox, itemsBox, equippedBox, weaponsBox, controlsBox, savedUnitsBox);
         controlsLayout.setPadding(new javafx.geometry.Insets(15));
         
@@ -232,16 +238,7 @@ public class GameUI extends Application {
                     if (isUpdatingSpinner) return; // Verhindert rekursive Aufrufe
                     if (selected != null && newVal > oldVal) {
                         if (limitManager.addUnitPossible(selected)) {
-                            for (Item item : selected.getEquipment()) {
-                                for (int j = oldVal; j < newVal; j++) {
-                                    if (limitManager.canEquip(item.getName())) {
-                                        limitManager.equipItem(item.getName());
-                                    // Item erfolgreich ausgerüstet
-                                    } else {
-                                        break; // Abbruch, wenn Limit erreicht
-                                        }
-                                }
-                            }
+                            
                         } else {
                             isUpdatingSpinner = true; // Verhindert rekursive Aufrufe
                             quantitySpinner[index].getValueFactory().setValue(oldVal); // Setzt den alten Wert zurück
@@ -299,6 +296,25 @@ public class GameUI extends Application {
 
         primaryStage.setScene(new Scene(root, 1000, 800));
         primaryStage.show();
+    }
+
+    private void removeSavedUnitAndReleaseItems(Unit unitToRemove) {
+        if (unitToRemove == null) return;
+
+        // Items im LimitManager wieder freigeben
+        for (Item item : unitToRemove.getEquipment()) {
+            limitManager.unequipItem(item.getName());
+        }
+
+        // Einheit aus der Speicherung entfernen
+        unitStorage.getSavedUnits().remove(unitToRemove);
+
+        // UI aktualisieren
+        updateSafeSlotComboBoxes();
+        savedUnitsView.getItems().setAll(unitStorage.getSavedUnits());
+        updateItemListView();
+        weaponsView.getItems().clear();
+        equippedItemsView.getItems().clear();
     }
 
     private void updateUnitStats() {
